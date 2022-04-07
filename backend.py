@@ -3,20 +3,26 @@ import requests
 import os
 import urllib.request
 import ssl
+import openai
 
 # make sure you specify .env
-ML_INFERENCE_SERVER_ENDPOINT = os.environ["ML_INFERENCE_SERVER_ENDPOINT"]
-ML_INFERENCE_SERVER_ENDPOINT_SNORKEL = os.environ[
-    "ML_INFERENCE_SERVER_ENDPOINT_SNORKEL"
-]
-ML_ZEROSHOT_INFERENCE_SERVER_ENDPOINT = os.environ[
-    "ML_ZEROSHOT_INFERENCE_SERVER_ENDPOINT"
-]
+OPENAI_KEY = os.environ["OPENAI_KEY"]
+# COHERE_KEY = os.environ["COHERE_KEY"]
+# GOOSEAI_KEY = os.environ["GOOSEAI_KEY"]
+# GPTJ_KEY = os.environ["GPTJ_KEY"]
 LABELSTUDIO_ENDPOINT = os.environ["LABELSTUDIO_ENDPOINT"]
 LABELSTUDIO_API_TOKEN = os.environ["LABELSTUDIO_API_TOKEN"]
 
 
-def remote_zeroshot_inference_request(input_text, candidate_labels, multi_class=False):
+# Load your API key from an environment variable or secret management service
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+response = openai.Completion.create(
+    engine="text-davinci-002", prompt="Say this is a test", temperature=0, max_tokens=6
+)
+
+
+def inference_request(input_text, candidate_labels, multi_class=False):
 
     # loading = st.info(f"Running prediction request ...")
 
