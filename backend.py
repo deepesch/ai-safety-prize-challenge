@@ -1,8 +1,6 @@
 import json
 import requests
 import os
-import urllib.request
-import ssl
 import openai
 import streamlit as st
 
