@@ -4,6 +4,7 @@ import os
 import urllib.request
 import ssl
 import openai
+import streamlit as st
 
 # make sure you specify .env
 OPENAI_KEY = os.environ["OPENAI_KEY"]
@@ -14,91 +15,29 @@ LABELSTUDIO_ENDPOINT = os.environ["LABELSTUDIO_ENDPOINT"]
 LABELSTUDIO_API_TOKEN = os.environ["LABELSTUDIO_API_TOKEN"]
 
 
-# Load your API key from an environment variable or secret management service
-openai.api_key = os.getenv("OPENAI_API_KEY")
+def openai_inference_request(input_text, temperature=0.9, number_of_completions=1):
 
-response = openai.Completion.create(
-    engine="text-davinci-002", prompt="Say this is a test", temperature=0, max_tokens=6
-)
+    loading = st.info(f"Running prediction request ...")
 
-
-def inference_request(input_text, candidate_labels, multi_class=False):
-
-    # loading = st.info(f"Running prediction request ...")
-
-    payload = {
-        "inputs": [input_text],
-        "parameters": {
-            "candidate_labels": candidate_labels,
-            "multi_class": multi_class,
-        },
-    }
-
-    print(payload)
-    response = requests.request(
-        "POST",
-        ML_ZEROSHOT_INFERENCE_SERVER_ENDPOINT,
-        json=payload,
-        headers={"Content-Type": "application/json"},
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    n = number_of_completions
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=input_text,
+        temperature=temperature,
+        max_tokens=6,
+        n=n,
+        stream=True,
     )
+    response["choices"][0]["text"]
 
-    # loading.empty()
+    loading.empty()
 
-    return json.loads(response.text)
-
-
-def remote_inference_request(input_text, model_name):
-    payload = {"text": input_text, "model_name": model_name}
-
-    headers = {"Content-Type": "application/json"}
-
-    response = requests.request(
-        "POST", ML_INFERENCE_SERVER_ENDPOINT, json=payload, headers=headers
-    )
-
-    return json.loads(response.text)
-
-
-def remote_inference_request_snorkel(input_text, model_name="toxicity"):
-    def allowSelfSignedHttps(allowed):
-        # bypass the server certificate verification on client side
-        if (
-            allowed
-            and not os.environ.get("PYTHONHTTPSVERIFY", "")
-            and getattr(ssl, "_create_unverified_context", None)
-        ):
-            ssl._create_default_https_context = ssl._create_unverified_context
-
-    allowSelfSignedHttps(
-        True
-    )  # this line is needed if you use self-signed certificate in your scoring service.
-
-    data = {"text": input_text}
-
-    body = str.encode(json.dumps(data))
-    url = ML_INFERENCE_SERVER_ENDPOINT_SNORKEL
-    headers = {"Content-Type": "application/json"}
-
-    req = urllib.request.Request(url, body, headers)
-    try:
-        response = urllib.request.urlopen(req)
-        result = response.read()
-        return json.loads(result)
-
-    except urllib.error.HTTPError as error:
-        print("The request failed with status code: " + str(error.code))
-        # Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
-        print(error.info())
-        print(json.loads(error.read().decode("utf8", "ignore")))
+    return response["choices"][0]["text"]
 
 
 def import_to_labelstudio(
-    input_text,
-    project_id,
-    predicted_labels,
-    predicted_scores,
-    model_name="",
-    multilabel=False,
+    input_text, project_id, predicted_labels, predicted_scores, model_name=""
 ):
 
     url = f"{LABELSTUDIO_ENDPOINT}/api/projects/{project_id}/tasks/bulk/"
