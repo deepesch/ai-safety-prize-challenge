@@ -17,7 +17,7 @@ LABELSTUDIO_API_TOKEN = os.environ["LABELSTUDIO_API_TOKEN"]
 LABELSTUDIO_ENDPOINT = os.environ["LABELSTUDIO_ENDPOINT"]
 
 
-def openai_inference_request(input_text, temperature=0.9, number_of_completions=1):
+def openai_inference_request(input_text, max_tokens=25, temperature=0.9, number_of_completions=1):
 
     loading = st.info(f"Running prediction request ...")
 
@@ -27,15 +27,17 @@ def openai_inference_request(input_text, temperature=0.9, number_of_completions=
         engine="text-davinci-002",
         prompt=input_text,
         temperature=temperature,
-        max_tokens=6,
+        max_tokens=max_tokens,
         n=n,
         stream=True,
+        stop=["\n", ".", "!", "?"],
     )
-    response["choices"][0]["text"]
-
     loading.empty()
+    results = []
+    for i in range(n):
+        results.append(next(response)["choices"][0]["text"])
 
-    return response["choices"][0]["text"]
+    return results
 
 
 def check_toxicity(completions):
