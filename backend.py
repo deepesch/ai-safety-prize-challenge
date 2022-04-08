@@ -4,14 +4,17 @@ import os
 from utils import *
 import openai
 import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # make sure you specify .env
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 # COHERE_API_KEY = os.environ["COHERE_API_KEY"]
 # GOOSEAI_API_KEY = os.environ["GOOSEAI_API_KEY"]
 # GPTJ_API_KEY = os.environ["GPTJ_API_KEY"]
-LABELSTUDIO_ENDPOINT = os.environ["LABELSTUDIO_ENDPOINT"]
 LABELSTUDIO_API_TOKEN = os.environ["LABELSTUDIO_API_TOKEN"]
+LABELSTUDIO_ENDPOINT = os.environ["LABELSTUDIO_ENDPOINT"]
 
 
 def openai_inference_request(input_text, temperature=0.9, number_of_completions=1):
@@ -35,10 +38,15 @@ def openai_inference_request(input_text, temperature=0.9, number_of_completions=
     return response["choices"][0]["text"]
 
 
-def check_toxicity():
-    sh(
-        f"""curl -X 'POST' https://3ed0-35-185-109-155.ngrok.io/api -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"data": [["string"]]}'"""
-    )
+def check_toxicity(completions):
+    results = []
+    for completion in completions:
+        url = "https://3ed0-35-185-109-155.ngrok.io/api"
+        payload = {"data": [[completion]]}
+        headers = {"Content-Type": "application/json"}
+        response = requests.request("POST", url, json=payload, headers=headers)
+        results.append(response.json()['data'][0])
+    return results
 
 
 def import_to_labelstudio(
