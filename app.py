@@ -26,7 +26,7 @@ demos = json.load(demo_config_file)
 demo_config_file.close()
 
 # Lowest score value to consider
-MIN_SCORE_THRESHOLD = 0.6
+MIN_SCORE_THRESHOLD = 0.3
 
 # Title
 st.sidebar.subheader("AI Safety Prize Challenge")
@@ -130,8 +130,8 @@ def main():
                 with st.beta_expander("See detailed scores", expanded=True):
                     st.write(prediction_result)
 
-                predicted_scores = np.array(prediction_result["scores"])
-                predicted_labels = prediction_result["labels"]
+                predicted_scores = np.array(list(prediction_result.values()))
+                predicted_labels = list(prediction_result.keys())
 
                 if len(predicted_scores[predicted_scores >= MIN_SCORE_THRESHOLD]) == 0:
 
