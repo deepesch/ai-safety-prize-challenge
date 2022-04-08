@@ -23,8 +23,8 @@ def radar_chart_plot(df):
 def bar_chart_plot(prediction_result):
     plt.plot()
 
-    height = prediction_result["scores"]
-    bars = prediction_result["labels"]
+    height = list(prediction_result.values())
+    bars = list(prediction_result.keys())
     y_pos = np.arange(len(bars))
 
     # Create bars
