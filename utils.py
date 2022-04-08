@@ -1,6 +1,16 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
+
+
+class ExitCodeError(Exception):
+    pass
+
+
+def sh(x):
+    if os.system(x):
+        raise ExitCodeError()
 
 
 def radar_chart_plot(df):
