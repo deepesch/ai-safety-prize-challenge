@@ -39,7 +39,7 @@ selected_demo = st.sidebar.selectbox("Select demo", list(demos.keys()), 0)
 
 def main():
 
-    if selected_demo == "DBpedia14":
+    if selected_demo == "Injury":
         st.header(demos[selected_demo]["title"])
 
         st.sidebar.write(demos[selected_demo]["description"])
