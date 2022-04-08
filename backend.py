@@ -1,14 +1,15 @@
 import json
 import requests
 import os
+from utils import *
 import openai
 import streamlit as st
 
 # make sure you specify .env
-OPENAI_KEY = os.environ["OPENAI_KEY"]
-# COHERE_KEY = os.environ["COHERE_KEY"]
-# GOOSEAI_KEY = os.environ["GOOSEAI_KEY"]
-# GPTJ_KEY = os.environ["GPTJ_KEY"]
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+# COHERE_API_KEY = os.environ["COHERE_API_KEY"]
+# GOOSEAI_API_KEY = os.environ["GOOSEAI_API_KEY"]
+# GPTJ_API_KEY = os.environ["GPTJ_API_KEY"]
 LABELSTUDIO_ENDPOINT = os.environ["LABELSTUDIO_ENDPOINT"]
 LABELSTUDIO_API_TOKEN = os.environ["LABELSTUDIO_API_TOKEN"]
 
@@ -32,6 +33,12 @@ def openai_inference_request(input_text, temperature=0.9, number_of_completions=
     loading.empty()
 
     return response["choices"][0]["text"]
+
+
+def check_toxicity():
+    sh(
+        f"""curl -X 'POST' https://3ed0-35-185-109-155.ngrok.io/api -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"data": [["string"]]}'"""
+    )
 
 
 def import_to_labelstudio(
