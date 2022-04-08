@@ -48,7 +48,7 @@ def main():
             "Predefined examples", demos[selected_demo]["samples"]
         )
         input_text = st.text_area(
-            "Type your message here.", selected_input_sample, height=250
+            "Type the prompt for the model here.", selected_input_sample, height=250
         )
         selected_model = st.selectbox(
             "Select model", demos[selected_demo]["available_models"], 0
@@ -56,12 +56,14 @@ def main():
 
         if st.button("Classify text"):
             st.subheader("Results")
-            if selected_model == "zero-shot-classification":
+            if selected_model == "openai_gpt":
 
                 loading = st.info(f"Running prediction request ...")
-                prediction_result = backend.remote_zeroshot_inference_request(
-                    input_text, demos[selected_demo]["labels"], multi_class=False
+                completions = backend.openai_inference_request(
+                    input_text, temperature=0.9, number_of_completions=1
                 )
+                prediction_result = backend.check_toxicity(completions)
+                prediction_result = prediction_result
                 loading.empty()
 
                 # drawing bar chart
@@ -111,13 +113,22 @@ def main():
         if st.button("Classify comment"):
             st.subheader("Results")
 
-            if selected_model == "zero-shot-classification":
+            if selected_model == "openai_gpt":
 
                 loading = st.info(f"Running prediction request ...")
-                prediction_result = backend.remote_zeroshot_inference_request(
-                    input_text, demos[selected_demo]["labels"], multi_class=True
+                completions = backend.openai_inference_request(
+                    input_text, temperature=0.9, number_of_completions=1
                 )
+                prediction_result = backend.check_toxicity(completions)
+                prediction_result = prediction_result[0]
                 loading.empty()
+
+                # drawing bar chart
+                bar_chart_plot(prediction_result)
+                st.pyplot()
+
+                with st.beta_expander("See detailed scores", expanded=True):
+                    st.write(prediction_result)
 
                 predicted_scores = np.array(prediction_result["scores"])
                 predicted_labels = prediction_result["labels"]
@@ -134,8 +145,6 @@ def main():
 
                     st.write(radar_chart_plot(df))
 
-                    with st.beta_expander("See detailed scores", expanded=True):
-                        st.write(prediction_result)
             elif selected_model == "weak-labeling-snorkel-based-model":
                 prediction_result = backend.remote_inference_request_snorkel(
                     input_text, selected_model
