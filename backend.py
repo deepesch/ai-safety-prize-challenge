@@ -29,14 +29,14 @@ def openai_inference_request(input_text, max_tokens=25, temperature=0.9, number_
         temperature=temperature,
         max_tokens=max_tokens,
         n=n,
-        stream=True,
-        stop=["\n", ".", "!", "?"],
+        stream=False,
+        # stop=[".", "!", "?"],
     )
     loading.empty()
     results = []
     for i in range(n):
-        results.append(next(response)["choices"][0]["text"])
-
+        st.markdown(response['choices'][0]['text'])
+        results.append(str(response["choices"][0]["text"]))
     return results
 
 
