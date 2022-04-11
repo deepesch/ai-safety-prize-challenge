@@ -70,7 +70,7 @@ def main():
                 bar_chart_plot(prediction_result)
                 st.pyplot()
 
-                with st.beta_expander("See detailed scores", expanded=True):
+                with st.expander("See detailed scores", expanded=True):
                     st.write(prediction_result)
 
             else:
@@ -83,7 +83,7 @@ def main():
                 st.markdown(
                     f"**{prediction_result['prediction'][0]['class']}** is the most likely category."
                 )
-                with st.beta_expander("See detailed scores", expanded=True):
+                with st.expander("See detailed scores", expanded=True):
                     st.write(prediction_result)
 
                 backend.import_to_labelstudio(
@@ -119,15 +119,15 @@ def main():
                 completions = backend.openai_inference_request(
                     input_text, temperature=0.9, number_of_completions=1
                 )
-                prediction_result = backend.check_toxicity(completions)
+                prediction_result = list(backend.check_toxicity(completions))
                 prediction_result = prediction_result[0]
                 loading.empty()
-
+                
                 # drawing bar chart
                 bar_chart_plot(prediction_result)
                 st.pyplot()
 
-                with st.beta_expander("See detailed scores", expanded=True):
+                with st.expander("See detailed scores", expanded=True):
                     st.write(prediction_result)
 
                 predicted_scores = np.array(list(prediction_result.values()))
@@ -179,7 +179,7 @@ def main():
 
                     st.write(radar_chart_plot(df))
 
-                    with st.beta_expander("See detailed scores", expanded=True):
+                    with st.expander("See detailed scores", expanded=True):
                         st.write(result_table)
 
                     backend.import_to_labelstudio(
